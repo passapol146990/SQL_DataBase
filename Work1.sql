@@ -140,12 +140,12 @@ FROM	SECTION
 WHERE	subid = 'CS001'
 
 -- เทอม 1-2021 เปิดสอนทั้งหมดกี่วิชา
-SELECT	count(*) as count_1_2021
+SELECT	count(distinct subid) as count_1_2021
 FROM	SECTION
 WHERE	term = '1-2021'
 
 -- แสดงจำนวนวิชาที่เปิดสอนปี 2020
-SELECT	count(*) as count_2020
+SELECT	count(distinct subid) as count_2020
 FROM	SECTION
 WHERE	term like '%2020'
 
