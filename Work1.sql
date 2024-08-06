@@ -260,34 +260,80 @@ FROM	STUDENT
 WHERE	major = 'CS'
 
 -- แสดงข้อมูลของอาจารย์ที่เงินเดือนน้อยที่สุด 2 คน
+select	top 2 * 
+from	lecturer
+order by salary asc
+
 -- แสดงรหัสอาจารย์ และจำนวนครั้งที่เคยสอน 
+select		lecid,
+			count(*) as count
+from		section
+group by	lecid
+
 -- แสดงรหัสอาจารย์ และจำนวนครั้งที่เคยสอน โดยแสดงเฉพาะอาจารย์ที่สอนมากที่ 3 คน
+select		top 3 lecid,
+			count(*) as count
+from		section
+group by	lecid 
+
 -- แสดงรหัสวิชา ชื่อวิชา และ รหัสวิชาเงื่อนไข ถ้าวิชาใดไม่มีวิชาเงื่อนไข ให้แสดงข้อความ  ไม่มีวิชาเงื่อนไข
+select	sid,name,cast(
+		case
+			when prerequisite is null then 'ไม่มีวิชาเงื่อนไข'
+			else prerequisite
+		end as varchar(20))as 'วิชาเงื่อนไข'
+from	subject
 
 -- แสดง ชื่อmajor , gpa สูงสุดของ major นั้น ๆ และ gpa ต่ำสุดของ major นั้น ๆ 
 -- โดยไม่แสดงข้อมูลที่ major เป็น null
 -- ตัวอย่างการแสดงผล
--- major		Max_GPA	Min_GPA
+-- major	Max_GPA	Min_GPA
 -- Art		3.98		3.05
 -- CS		3.98		1.55
 -- PY		2.85		1.50
 -- Thai		2.78		2.78
+select * from student
+select		major,
+			max(gpa) as max_GPX,
+			min(gpa) as min_GPA
+from		student
+where		major is not null
+group by	major
 
--- แสดง ชื่อmajor , gpa สูงสุดของ major นั้น ๆ และ gpa ต่ำสุดของ major นั้น ๆ 
+-- แสดง ชื่อ major, gpa สูงสุดของ major นั้น ๆ และ gpa ต่ำสุดของ major นั้น ๆ 
 -- โดยแสดงเฉพาะ major ที่มีค่า gpa ต่ำสุด มากกว่า 2.00
 -- ตัวอย่างการแสดงผล
--- major		Max_GPA	Min_GPA
+-- major	Max_GPA	Min_GPA
 -- Art		3.98		3.05
 -- Thai		2.78		2.78
+select		major,
+			max(gpa) as Max_GPA,
+			min(gpa) as Min_GPA
+from		student
+where		gpa > 2
+group by	major
 
---  แสดง ชื่อmajor , จำนวนนิสิตใน major นั้น, gpa สูงสุดของ major นั้น และ gpa ต่ำสุดของ major นั้น 
+-- แสดง ชื่อ major, จำนวนนิสิตใน major นั้น, gpa สูงสุดของ major นั้น และ gpa ต่ำสุดของ major นั้น 
 -- โดยแสดงเฉพาะ major ที่มีจำนวนนิสิตมากกว่า 1 คน และ gpa ต่ำสุดของ major นั้นมากกว่า 1.5
 -- และ  major ไม่เป็น null
 -- เรียงลำดับตาม จำนวนนิสิตจากมากไปน้อย
+select * from student
 
-
+select		major,
+			count(*) as count_student,
+			max(gpa) as Max_GPA,
+			min(gpa) as Min_GPA
+from		student
+where		gpa > 1.5
+and			major is not null
+group by	major
 
 -- แสดงปีเกิด และจำนวนนิสิตที่เกิดปีนั้น โดยแสดงเฉพาะที่ปีไม่เป็น null
+select		year(birthday),
+			count(*) as count_day
+from		student
+where		birthday is not null
+group by	year(birthday)
 
 -- แสดง รหัสนิสิต, และจำนวนครั้งที่ลงเรียน 
 -- แสดง รหัสวิชา, และจำนวนครั้งที่เคยเปิดสอน
