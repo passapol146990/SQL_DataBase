@@ -335,29 +335,111 @@ from		student
 where		birthday is not null
 group by	year(birthday)
 
+SELECT * FROM ENROLL
 -- แสดง รหัสนิสิต, และจำนวนครั้งที่ลงเรียน 
+SELECT 		stdid,
+			count(*) as count_learn
+FROM 		ENROLL
+GROUP BY 	stdid
+
 -- แสดง รหัสวิชา, และจำนวนครั้งที่เคยเปิดสอน
+SELECT 		subid,
+			COUNT(*) as count_open
+FROM 		SECTION
+GROUP BY 	subid
+
 -- แสดง เกรด, จำนวนครั้งที่ได้เกรดนั้น ๆ ของนิสิตรหัส 60001
+SELECT	 	grade,
+			COUNT(*) as count_grade
+FROM	 	ENROLL
+WHERE	 	stdid = '60001'
+GROUP BY 	grade
+
+select * from student
+select * from enroll
+select * from section
+select * from subject
+select * from lecturer
+
 -- แสดง รหัสนิสิต และ จำนวนครั้งที่ได้เกรด F ของนิสิตรหัสนั้น ๆ  
+SELECT		 	stdid,
+				COUNT(grade) as count_gradeF
+FROM			enroll
+WHERE 			grade = 'F'
+GROUP BY 		stdid
+
 -- แสดง รหัสนิสิต และ จำนวนครั้งที่ได้เกรด F โดยแสดงเฉพาะนิสิตที่ได้เกรด F มากกว่า 1 ครั้ง
+SELECT 		stdid,
+			COUNT(grade) as count_gradeF
+FROM 		ENROLL
+WHERE 		grade = 'F'
+GROUP BY 	stdid
+having  	COUNT(*) > 1
+
 -- แสดงรหัสอาจารย์ที่เคยสอนมากกว่า 3 ครั้ง
+SELECT 		lecid,
+			COUNT(*) as count_learn
+FROM 		SECTION
+GROUP BY 	lecid
+HAVING 		COUNT(*) > 3
+
 -- แสดงรหัสอาจารย์ที่เคยสอนวิชา CS001 มากกว่า 1 ครั้ง
+SELECT 		lecid
+FROM 		SECTION
+WHERE 		subid = 'CS001'
+GROUP BY	lecid
+HAVING		COUNT(lecid) > 1 
+
 -- แสดงรหัสอาจารย์ รหัสวิชา และจำนวนครั้งที่อาจารย์เคยสอนวิชานั้น  
 -- โดยแสดงเฉพาะที่มีสอนมากกว่า 1 ครั้ง เรียงลำดับตามรหัสอาจารย์
+SELECT 		lecid,
+			subid,
+			COUNT(lecid) as count_subject
+FROM 		SECTION
+GROUP BY 	lecid,subid
+HAVING		COUNT(subid) > 1
+ORDER BY 	SUBSTRING(lecid,2,3) DESC
 
 -- Select , update statement with CASE
 -- แสดง ข้อมูลของนิสิต โดยสนใจนิสิตที่ตรงตามเงื่อนไขนี้
 -- ถ้าอยู่สาขา cs 	ได้ gpa > 3.00
 -- ถ้าอยู่สาขา py 	ได้ gpa > 3.20
 -- ถ้าอยู่สาขา art 	ได้ gpa > 3.50
+SELECT 	* FROM 	STUDENT
+UPDATE STUDENT 
+set GPA =
+	case
+		when major = 'cs' 	then 3.00
+		when major = 'py' 	then 3.20
+		when major = 'art' 	then 3.50 
+	end
 
 -- แสดงรหัสนิสิต ชื่อ และอายุของนิสิต โดยสนใจนิสิตที่ตรงตามเงื่อนไขนี้
--- ถ้าอยู่สาขา cs  		อายุ > 18 ปี
--- ถ้าอยู่สาขา Art	  	อายุ > 19 ปี
--- ถ้าอยู่สาขา English  		อายุ > 17 ปี
--- ถ้าอยู่สาขาอื่น ๆ  		อายุ > 20 ปี
+-- ถ้าอยู่สาขา cs  			อายุ > 18 ปี
+-- ถ้าอยู่สาขา Art	  		อายุ > 19 ปี
+-- ถ้าอยู่สาขา English  	อายุ > 17 ปี
+-- ถ้าอยู่สาขาอื่น ๆ  		  อายุ > 20 ปี
+SELECT 	* 
+FROM 	STUDENT
+WHERE 	DATEDIFF(YEAR,birthday,GETDATE()) > 
+case
+	when major = 'cs' 		then 18
+	when major = 'art'		then 19
+	when major = 'English'	then 17
+	else 20 
+end
+
 -- เพิ่มเงินเดือนให้อาจารย์ โดยเพิ่มตามเงื่อนไขคือ
 -- ถ้าอาจารย์ได้เงินเดือน <= 30000 บาท 	เพิ่มเงินเดือนให้ 	20 %
 -- ถ้าอาจารย์ได้เงินเดือน 30001 - 40000 บาท 	เพิ่มเงินเดือนให้  10 %
 -- ถ้าอาจารย์ได้เงินเดือน 40001 - 50000 บาท 	เพิ่มเงินเดือนให้ 	 5 %
 -- ถ้าอาจารย์ได้เงินเดือนสูงกว่า 50000 บาท 	ไม่ต้องเพิ่มเงินเดือน
+SELECT * FROM LECTURER
+UPDATE LECTURER SET salary = 
+case
+	when salary <= 	30000 then salary * 1.2
+	when salary < 	40000 then salary * 1.1
+	when salary < 	50000 then salary * 1.05
+	else salary
+end
+SELECT * FROM LECTURER
