@@ -101,12 +101,6 @@ and		enroll.stdid	= student.sid
 and		section.secid	= enroll.secid
 and 	subject.sid		= section.subid
 and		lecturer.lid	= section.lecid
-
-select * from student
-select * from enroll
-select * from section
-select * from subject
-select * from lecturer
 	
 -- แสดงชื่อวิชา, เทอมที่สอน, ชื่อผู้สอน ของทุกวิชาที่สอนโดยอาจารย์ใน major CS
 select	subject.name,
@@ -152,23 +146,179 @@ AND		s1.prerequisite = s2.sid
 
 -- Outer Join
 -- แสดงชื่ออาจารย์และเทอมที่สอน ของอาจารย์ทุกคน รวมทั้งอาจารย์ที่ไม่เคยสอนเลย
+SELECT 	LECTURER.name, SECTION.term 
+FROM 	LECTURER left outer join SECTION
+on 		LECTURER.lid = SECTION.lecid
+
 -- แสดงชื่ออาจารย์ ชื่อวิชาที่สอน และเทอมที่สอน ของอาจารย์ทุกคน รวมทั้งอาจารย์ที่ไม่เคยสอนเลย
 -- โดยถ้าอาจารย์คนใดไม่เคยสอนเลย ให้แสดงข้อความ ไม่เคยสอน ในคอลัมน์ วิชา และเทอมที่สอน
+SELECT 	LECTURER.name,
+		ISNULL(SUBJECT.name,'ไม่มีวิชา') as subject_name, 
+		ISNULL(SECTION.term,'NoTerm') as section_name
+FROM 	LECTURER LEFT OUTER JOIN SECTION
+ON 		LECTURER.lid = SECTION.lecid
+LEFT OUTER JOIN SUBJECT
+ON		SECTION.subid = SUBJECT.sid
+
 -- แสดงรหัสนิสิต และรหัสวิชาที่ลงทะเบียนเรียน ของนิสิตทุกคน รวมทั้งคนที่ไม่เคยลงทะเบียนเรียนเลย
+SELECT 	STUDENT.sid,
+		SECTION.subid
+FROM    STUDENT left outer join ENROLL
+ON 		STUDENT.sid = ENROLL.stdid
+LEFT OUTER JOIN SECTION
+ON      ENROLL.secid = SECTION.secid
+
 -- แสดงรหัสนิสิต ชื่อวิชาเทอมที่เรียน เกรดที่ได้ ของนิสิตทุกคน รวมทั้งคนที่ไม่เคยลงทะเบียนเรียนเลย
+SELECT  STUDENT.sid,
+		SUBJECT.name,
+		ENROLL.grade
+FROM 	STUDENT LEFT OUTER JOIN ENROLL
+ON      STUDENT.sid = ENROLL.stdid
+LEFT OUTER JOIN SECTION
+ON      ENROLL.secid = SECTION.secid
+LEFT OUTER JOIN SUBJECT
+ON      SECTION.subid = SUBJECT.sid
 
 -- INTERSECT, EXCEPT,  UNION
--- แสดงรหัสนิสิต และชื่อนิสิตของนิสิตที่เคยเรียนทั้งวิชา cs001 และ cs002  
+-- แสดงรหัสนิสิต และชื่อนิสิตของนิสิตที่เคยเรียนทั้งวิชา cs001 และ cs002
+SELECT  STUDENT.sid,
+		STUDENT.name 
+FROM    STUDENT, ENROLL, SECTION
+WHERE   STUDENT.sid = ENROLL.stdid
+AND     ENROLL.secid = SECTION.secid
+AND     SECTION.subid = 'CS001'
+INTERSECT
+SELECT  STUDENT.sid,
+		STUDENT.name
+FROM    STUDENT, ENROLL, SECTION
+WHERE   STUDENT.sid 	= ENROLL.stdid
+AND     ENROLL.secid 	= SECTION.secid
+AND 	SECTION.subid 	= 'CS002'
+
 -- แสดงรหัสนิสิต และชื่อนิสิตของนิสิตที่เคยเรียนวิชา cs001 แต่ไม่เคยเรียน cs002
+SELECT 	STUDENT.sid,
+		STUDENT.name
+FROM    STUDENT, ENROLL, SECTION
+WHERE   STUDENT.sid 	= ENROLL.stdid
+AND     ENROLL.secid 	= SECTION.secid
+AND     SECTION.subid = 'CS001'
+INTERSECT
+SELECT  STUDENT.sid,
+		STUDENT.name
+FROM    STUDENT, ENROLL, SECTION
+WHERE   STUDENT.sid 	= ENROLL.stdid
+AND     ENROLL.secid 	= SECTION.secid
+AND     SECTION.subid 	<> 'CS002' 
+
 -- แสดง ชื่อ, สาขา ของอาจารย์ที่สอนในเทอม 1-2020 แต่ไม่ได้สอนเทอม 2-2020
+SELECT 	LECTURER.name,
+		LECTURER.major,
+		SECTION.term
+FROM    LECTURER,SECTION
+WHERE   SECTION.term = '1-2020'
+INTERSECT
+SELECT  LECTURER.name,
+		LECTURER.major,
+		SECTION.term
+FROM    LECTURER,SECTION
+WHERE   SECTION.term != '2-2020'
+
 -- แสดงรหัสและชื่ออาจารย์ที่สอนวิชา Programming แต่ไม่เคยสอน Database
+SELECT  LECTURER.lid,
+		LECTURER.name
+FROM    LECTURER, SUBJECT, SECTION
+WHERE 	LECTURER.lid 	= SECTION.lecid
+AND  	SECTION.subid	= SUBJECT.sid
+AND   	SUBJECT.name 	= 'Programming'
+EXCEPT
+SELECT 	LECTURER.lid,
+		LECTURER.name
+FROM  	LECTURER, SUBJECT, SECTION
+WHERE 	LECTURER.lid 	= SECTION.lecid
+AND  	SECTION.subid	= SUBJECT.sid
+AND    	SUBJECT.name 	= 'Database' 
+
+
 -- แสดงรหัสและชื่อนิสิตที่เคยเรียน Programming แต่ไม่เคยเรียน Graphics
+SELECT  STUDENT.sid,
+		STUDENT.name
+FROM    STUDENT, ENROLL, SECTION, SUBJECT
+WHERE   STUDENT.sid 	= ENROLL.stdid
+AND   	ENROLL.secid  	= SECTION.secid
+AND     SECTION.subid   = SUBJECT.sid
+AND     SUBJECT.name 	= 'Programming'
+EXCEPT
+SELECT  STUDENT.sid,
+		STUDENT.name
+FROM  	STUDENT, ENROLL, SECTION, SUBJECT
+WHERE 	STUDENT.sid 	= ENROLL.stdid
+AND   	ENROLL.secid 	= SECTION.secid
+AND  	SECTION.subid  	= SUBJECT.sid
+AND		SUBJECT.name   	= 'Graphics' 
+
 -- แสดง ชื่อ, ปีเกิด, อายุ ของนิสิตที่อายุน้อยที่สุด และอายุมากที่สุด
+SELECT 	top 1 name,
+		YEAR(birthday) as year,
+		DATEDIFF(year,birthday,GETDATE()) as age
+FROM	STUDENT 
+WHERE	DATEDIFF(year,birthday,GETDATE()) = 
+				(SELECT 	min(DATEDIFF(year,birthday,GETDATE()))
+				FROM  	STUDENT)
+UNION
+SELECT 	top 1 name,
+		YEAR(birthday) as year,
+		DATEDIFF(year,birthday,GETDATE()) as age
+FROM	STUDENT 
+WHERE	DATEDIFF(year,birthday,GETDATE()) = 
+				(SELECT 	max(DATEDIFF(year,birthday,GETDATE()))
+				FROM  	STUDENT)
+
+
 -- แสดง ชื่อ, ปีเกิด, อายุ ของนิสิตที่อายุน้อยที่สุด และอายุมากที่สุดใน major CS
+SELECT 	top 1 name,
+		YEAR(birthday) as year,
+		DATEDIFF(year,birthday,GETDATE()) as age
+FROM	STUDENT 
+WHERE	DATEDIFF(year,birthday,GETDATE()) = 
+				(SELECT 	min(DATEDIFF(year,birthday,GETDATE()))
+				FROM  	STUDENT
+				WHERE   major = 'CS')
+AND   	major = 'CS'
+UNION
+SELECT 	top 1 name,
+		YEAR(birthday) as year,
+		DATEDIFF(year,birthday,GETDATE()) as age
+FROM	STUDENT 
+WHERE	DATEDIFF(year,birthday,GETDATE()) = 
+				(SELECT 	max(DATEDIFF(year,birthday,GETDATE()))
+				FROM  	STUDENT
+				WHERE   major = 'CS')
+AND   	major = 'CS'
+
 -- แสดงข้อมูลของนิสิตสาขา CS ที่ไม่เคยเรียนวิชา Programming เลย
+SELECT 	* 
+FROM 	STUDENT
+WHERE	major = 'CS'
+	EXCEPT
+SELECT 	STUDENT.* 
+FROM	STUDENT, ENROLL, SECTION, SUBJECT
+WHERE 	STUDENT.sid 	= ENROLL.stdid
+AND 	ENROLL.secid    = SECTION.secid
+AND 	SECTION.subid 	= SUBJECT.sid
+AND     SUBJECT.name    = 'graphics'	
+
 
 -- Nested Join Statement
 -- แสดงชื่อของอาจารย์ภาควิชา CS ที่ไม่เคยสอนวิชา Programming
+SELECT  LECTURER.name
+FROM   	LECTURER
+WHERE  	major = 'CS'
+AND 	lid NOT IN 
+		(select 	SECTION.lecid
+		from 		SECTION, SUBJECT
+		WHERE 		SECTION.subid = SUBJECT.sid
+		AND 		SUBJECT.name  = 'Programming')
+
 -- แสดงจำนวนนิสิตที่ลงทะเบียนเรียนในเทอม 2-2020 (จากข้อ 2. ให้นับเฉพาะจำนวนนิสิต )
 -- แสดง รหัสอาจารย์และชื่อ ของอาจารย์ที่ไม่ได้สอนในภาคเรียน 1-2020
 -- แสดง name, ปีเกิด, อายุ ของนิสิตที่อายุน้อยที่สุด
@@ -206,3 +356,13 @@ AND		s1.prerequisite = s2.sid
 -- แสดงข้อมูลของอาจารย์ CS ที่เคยสอนวิชา Programming มากกว่า 2 ครั้ง
 -- แสดงรหัสอาจารย์ เทอมที่สอน และจำนวนวิชาที่สอนในเทอมนั้น
 -- เฉพาะอาจารย์ที่สอนมากกว่า 1 วิชาในเทอมนั้น โดยเรียงลำดับตามรหัสอาจารย์
+
+
+-- แสดงรหัส อ. ในเทอม 2-2020 ถ้าไม่มีสอนให้ใส่ 0
+-- SELECT  lid,count(*)
+-- FROM 	LECTURER LEFT OUTER JOIN SECTION
+-- WHERE 
+
+-- SELECT  *
+-- FROM 	SECTION
+-- WHERE 	SECTION.term = '2-2020'
