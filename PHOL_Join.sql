@@ -320,6 +320,21 @@ AND 	lid NOT IN
 		AND 		SUBJECT.name  = 'Programming')
 
 -- แสดงจำนวนนิสิตที่ลงทะเบียนเรียนในเทอม 2-2020 (จากข้อ 2. ให้นับเฉพาะจำนวนนิสิต )
+
+SELECT * FROM customer
+SELECT * FROM ENROLL
+SELECT * FROM LECTURER
+SELECT * FROM SECTION
+SELECT * FROM STUDENT
+SELECT * FROM SUBJECT
+
+select * from INFORMATION_SCHEMA.TABLES
+where table_schema = 'DB_66011212067_schema'
+
+select 	*
+from 	SECTION
+
+
 -- แสดง รหัสอาจารย์และชื่อ ของอาจารย์ที่ไม่ได้สอนในภาคเรียน 1-2020
 -- แสดง name, ปีเกิด, อายุ ของนิสิตที่อายุน้อยที่สุด
 -- แสดง name, ปีเกิด, อายุ ของนิสิตที่อายุมากที่สุด ใน major CS
