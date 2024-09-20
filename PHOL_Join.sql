@@ -14,12 +14,28 @@ select lid, name
 from lecturer, section
 where lecturer.lid = section.lecid
 and term = '1-2020'
+select lid, name
+from lecturer, section
+where lecturer.lid = section.lecid
+and term = '3-2020'
+select lid, name
+from lecturer, section
+where lecturer.lid = section.lecid
+and term = '1-2020'
 EXCEPT
 select lid, name
 from lecturer, section
 where lecturer.lid = section.lecid
 and term = '3-2020'
--- UNION เอาข้อมูลที่ไม่ซ้ำกันตาม SELENT ถ้าข้อมูลที่ต้องการ SELECT มันต้องกันจะเอามาอันเดียว ถ้ามีตรง collume ไหนสักอันเอามาหมด
+-- UNION เอาข้อมูลที่ไม่ซ้ำกันตาม SELECT ถ้าข้อมูลที่ต้องการ SELECT มันต้องกันจะเอามาอันเดียว ถ้ามีตรง collume ไหนสักอันเอามาหมด
+select lid, name
+from lecturer, section
+where lecturer.lid = section.lecid
+and term = '1-2020'
+select lid, name
+from lecturer, section
+where lecturer.lid = section.lecid
+and term = '3-2020'
 select lid, name
 from lecturer, section
 where lecturer.lid = section.lecid
@@ -38,7 +54,6 @@ on lecturer.lid = section.lecid
 
 -- isnull(collume,"ข้อมูลที่ต้องการแทนค่า")
 -- SELECT ISNULL(name,"ไม่มีชื่อ")  FROM ...
-
 
 -- distinct เอาไว้ใช้นำหน้า SELECT ไม่ให้ซ้ำกัน
 
