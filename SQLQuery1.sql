@@ -1,4 +1,3 @@
-
 -- การเข้าถึงข้อมูลแบบ join
 select lid,name
 from LECTURER,SECTION
